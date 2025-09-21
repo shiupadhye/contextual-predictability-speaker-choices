@@ -1,5 +1,10 @@
+# Ignore .DS_STORE
+*.DS_Store
+
 # Ignore all CSV files
 *.csv
 
 # Ignore all R Markdown files
 *.Rmd
+
+Study1-probabilistic-reduction/plots/

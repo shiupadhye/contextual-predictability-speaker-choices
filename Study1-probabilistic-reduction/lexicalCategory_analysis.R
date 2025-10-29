@@ -38,6 +38,9 @@ scores %>%
 m.FuncContentDist.mainEffect.deltaBwPred <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + delta_bwPred + Class + (1|speaker_id), data = scores)
 summary(m.FuncContentDist.mainEffect.deltaBwPred)
 
+m.FuncContentDist.mainEffect.condPMI<- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + condPMI  + Class + (1|speaker_id), data = scores)
+summary(m.FuncContentDist.mainEffect.condPMI)
+
 ## interaction
 m.FuncContentDist.int.deltaBwPred <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb * Class + infillFw_logProb * Class + delta_bwPred * Class + (1|speaker_id), data = scores)
 summary(m.FuncContentDist.int.deltaBwPred)
@@ -52,8 +55,6 @@ emtrends(m.FuncContentDist.int.deltaBwPred, specs = "Class", var = "delta_bwPred
 
 m.FuncContentDist.int.condPMI <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb * Class + infillFw_logProb * Class + condPMI * Class + (1|speaker_id), data = scores)
 summary(m.FuncContentDist.int.condPMI)
-
-
 
 
 ### visualize
@@ -199,10 +200,10 @@ p4 <- ggplot(condPMI_class, aes(x = condPMI, y = predicted, color = Class, fill 
         legend.title = element_text(face = "bold"))
 
 # save plots
-saveRDS(p1,'plots/rds/interaction_plot_freq.png')
-saveRDS(p2,'plots/rds/interaction_plot_fwPred.png')
-saveRDS(p3,'plots/rds/interaction_plot_bwPred.png')
-saveRDS(p4,'plots/rds/interaction_plot_PMI.png')
+saveRDS(p1,'plots/rds/interaction_plot_freq.rds')
+saveRDS(p2,'plots/rds/interaction_plot_fwPred.rds')
+saveRDS(p3,'plots/rds/interaction_plot_bwPred.rds')
+saveRDS(p4,'plots/rds/interaction_plot_PMI.rds')
 
 # Replication of Bell et al. 2009
 scores.HF_func <- scores %>%

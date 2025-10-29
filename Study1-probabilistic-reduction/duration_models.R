@@ -1,3 +1,4 @@
+library(car)
 library(tidyverse)
 library(lme4)
 library(ggsignif)
@@ -13,10 +14,10 @@ library(lmerTest)
 library(dominanceanalysis)
 
 scores <- read_csv('SWBD_DurAnalysisData.csv')
-scores <- scores %>% filter(CLASS != 'OTHER')
+scores <- scores %>% filter(Class != 'OTHER')
 
 # define backward predictability variants
-scores$delta_bwPred <- scores$infillBw_logProb - scores$infillFw_logProb
+scores$relative_bwPred <- scores$infillBw_logProb - scores$infillFw_logProb
 scores <- scores %>% rename(condPMI = infill_pmiFP)
 
 # Comparison of Futue Context Predictability Measures
@@ -26,20 +27,34 @@ summary(m.baseline)
 m.bw <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + infillBw_logProb + (1|speaker_id), data = scores)
 summary(m.bw)
 
-m.deltaBwPred <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + delta_bwPred + (1|speaker_id), data = scores)
-summary(m.deltaBwPred)
+m.relBwPred <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + relative_bwPred + (1|speaker_id), data = scores)
+summary(m.relBwPred)
 
 m.condPMI <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + condPMI + (1|speaker_id), data = scores)
 summary(m.condPMI)
 
-m.both <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + delta_bwPred + condPMI + (1|speaker_id), data = scores)
+m.both <- lmer(duration * 1000 ~ word_len + uttrSR + age + sex + unigram_logProb + infillFw_logProb + relative_bwPred + condPMI + (1|speaker_id), data = scores)
 summary(m.both)
 
-# Model comparisions
+
+# Vif for backward predictability model
+vif(m.bw)
+kappa(m.bw)
+cor(scores$infillFw_logProb, scores$infillBw_logProb)
+
+# Model comparisons
 ## Compare against baseline
-lrtest(m.baseline,m.deltaBwPred)
+# ll
+lrtest(m.baseline,m.relBwPred)
+lrtest(m.bw,m.relBwPred)
 lrtest(m.baseline,m.condPMI)
 lrtest(m.baseline,m.both)
+# AIC
+BIC(m.baseline,m.relBwPred)
+BIC(m.bw,m.relBwPred)
+BIC(m.baseline,m.condPMI)
+BIC(m.baseline,m.both)
+
 ## Compare variants measures
 lrtest(m.bw,m.deltaBwPred)
 lrtest(m.deltaBwPred,m.condPMI)
